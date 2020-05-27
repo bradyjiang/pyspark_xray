@@ -1,0 +1,135 @@
+# pyspark-xray
+:toc:
+
+pyspark_xray is a diagnostic tool, in the form of Python library, for pyspark developers to debug and troubleshoot PySpark applications locally, specifically it enables local debugging of PySpark RDD transformation functions.
+
+The purpose of developing pyspark_xray is to develop a PySpark development framework that enables PySpark application developers to do local debugging using sampled input data and remote production running using the entire input data using SAME code base without any modification.
+
+This repository provides Python library and a <<demo-app, demo PySpark application>> for users to setup local dev environment on PyCharm for running, testing and debugging Spark applications as well as their RDD transformation functions.
+
+## Benefits
+Aside from PyCharm debugging capabilties, this package provides the following incremental debugging capabilities to Spark application developers:
+
+* instructions and documentation for setting up PyCharm-based local debugger for Spark application
+* code library to step into RDD/Dataframe native lambda functions using wrapper functions for RDD/Dataframe native lambda functions
+* code library / instructions for automatically switching between local and remote Spark run environments using same code base
+
+## Setup
+
+last updated: May 20, 2020
+
+### required dependencies
+
+* pyspark_xray (this package)
+* spark
+* pyspark
+* java
+* PyCharm
+
+### Preparation Steps
+
+* Open command line, kick off `java` command, if you get an error, then download and install **java** (version 1.8.0_221 as of April 2020)
+* If you don't have it, download and install **PyCharm** Community edition (version 2020.1 as of April 2020)
+* If you don't have it, download and install Anaconda Python 3.7 runtime
+* Download and install **spark** latest Pre-built for Apache Hadoop (spark-2.4.5-bin-hadoop2.7 as of April 2020, 200+MB size) locally
+  * **Windows**:
+    * if you don't have unzip tool, please download and install 7zip, a free tool to zip/unzip files
+    * extract contents of spark tgz file to c:\spark-x.x.x-bin-hadoopx.x folder
+    * follow the steps in https://medium.com/big-data-engineering/how-to-install-apache-spark-2-x-in-your-pc-e2047246ffc3[this tutorial]
+        * install `winutils.exe` into `c:\spark-x.x.x-bin-hadoopx.x\bin` folder, without this executable, you will run into error when writing engine output
+        * add `HADOOP_HOME` environment variable, and point it to `c:\spark-x.x.x-bin-hadoopx.x` path
+  * **Mac**:
+    * extract contents of spark tgz file to \Users\[USERNAME]\spark-x.x.x-bin-hadoopx.x folder
+* install **pyspark** by `pip install pyspark` or `conda install pyspark`
+
+
+# Demo App
+
+The demo_app folder contains a simple PySpark application that takes data of 11 loans into Spark Dataframe and then converts it to RDD, then calculate interest amount for each loan by calling `calc_mthly_payment` and `calc_interest` RDD transformation functions to calculate monthly payment amount and total interest amount for each loan respectively, see input and output below
+
+```
+ingested 11 loans
+input =
++-------+--------+-----+----------+
+|loan_id|loan_amt|  apr|term_years|
++-------+--------+-----+----------+
+|    300| 15000.0|0.054|         6|
+|    301| 27000.0|0.034|         6|
+|    302| 33000.0|0.053|         5|
+|    303| 45000.0|0.035|         5|
+|    304| 56000.0|0.033|         7|
+|    305| 44000.0|0.032|         4|
+|    306| 25000.0|0.043|         5|
+|    307| 26000.0|0.023|         7|
+|    308| 35200.0|0.034|         6|
+|    309| 57000.0|0.055|         5|
+|    310| 45300.0|0.034|         5|
++-------+--------+-----+----------+
+
+payment output =
++-------+---------------+
+|loan_id|monthly_pmt_amt|
++-------+---------------+
+|    300|         244.37|
+|    301|         415.08|
+|    302|          627.3|
+|    303|         818.63|
+|    304|         747.54|
+|    305|          977.8|
+|    306|         463.81|
+|    307|          335.4|
+|    308|         541.14|
+|    309|        1088.77|
+|    310|         822.06|
++-------+---------------+
+
+interest output =
++-----------------+-------+
+|     interest_amt|loan_id|
++-----------------+-------+
+|           4860.0|    300|
+|5508.000000000001|    301|
+|           8745.0|    302|
+|7875.000000000001|    303|
+|          12936.0|    304|
+|           5632.0|    305|
+|           5375.0|    306|
+|           4186.0|    307|
+|7180.800000000001|    308|
+|          15675.0|    309|
+|           7701.0|    310|
++-----------------+-------+
+```
+
+## Setup
+
+From command line, users issue `spark-submit` command which submit a Spark job to cluster, within PyCharm, `spark-submit` cannot be used to kick off a Spark job.
+
+* use Github Desktop or other git tools to clone `pyspark_xray` locally
+* PyCharm > Open pyspark_xray as project
+* Open PyCharm > Run > Edit Configurations > Defaults > Python and enter the following values:
+  * **Environment variables** (Windows): `PYTHONUNBUFFERED=1;PYSPARK_PYTHON=python;PYTHONPATH=$SPARK_HOME/python;PYSPARK_SUBMIT_ARGS=pyspark-shell;HADOOP_HOME=C:\spark-2.4.5-bin-hadoop2.7`
+  * click Apply or OK
+* Open PyCharm > Run > Edit Configurations, create a new Python configuration, point the script to the path of `driver.py` of pyspark_xray > demo_app
+* click Appy or OK
+
+## Debug Locally
+
+In main.py, for demonstration purpose, RDD transformation functions are called at two places
+
+* first calling native RDD mapValues function and `calc_mthly_interest` function like this `rdd_pmt = loan_rdd.mapValues(lambda x: utils_slave.calc_mthly_payment(row=x))`
+* second calling pyspark_xray's wrapper of RDD mapValues `wrapper_mapvalues` and `calc_interest` function like this `utils_debugger.wrapper_mapvalues`
+
+image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-main-wrapper-mapvalues.png[stopped at main wrapper mapvalues]
+
+Corresponding to them, we set break points in  `calc_mthly_payment` and `calc_interest` lambda functions respectively in utils_s.py.  Among these 2 break points, only the 2nd one will be stopped as shown below, the 1st one will NEVER be stopped
+
+image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-utils_s-calc-interest.png[stopped at calc_interest RDD transformation function]
+
+# References
+
+PySpark Resources:
+
+* https://www.reddit.com/r/apachespark/[reddit r/apachespark]
+* https://github.com/topics/pyspark[pyspark topic] on Github
+* another pyspark tuning tool: https://github.com/msukmanowsky/drpyspark[drpyspark]
