@@ -17,7 +17,7 @@ https://github.com/bradyjiang/pyspark_xray/tree/master/pyspark_xray[**pyspark_xr
 
 check out <<demo-app, demo app>> section for an example use case.
 
-# Demo App
+## Demo App
 
 The https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app[**demo_app**] folder contains a simple PySpark application that takes data of 11 loans into a Spark RDD, then calculates interest amount for each loan by passing `calc_mthly_payment` and `calc_interest` lambda functions respectively to RDD `mapValues` transformation to calculate monthly payment amount and total interest amount for each loan respectively, see input and output below
 
@@ -75,7 +75,7 @@ interest output =
 +-----------------+-------+
 ```
 
-## Dependencies
+### Dependencies
 
 * pyspark_xray (this package)
 * spark
@@ -83,7 +83,7 @@ interest output =
 * java
 * PyCharm
 
-## Preparation
+### Preparation
 
 * Open command line, kick off `java` command, if you get an error, then download and install **java** (version 1.8.0_221 as of April 2020)
 * If you don't have it, download and install **PyCharm** Community edition (version 2020.1 as of April 2020)
@@ -98,7 +98,7 @@ interest output =
     *** extract contents of spark tgz file to \Users\[USERNAME]\spark-x.x.x-bin-hadoopx.x folder
 * install **pyspark** by `pip install pyspark` or `conda install pyspark`
 
-## Run Configuration
+### Run Configuration
 
 You run Spark application on a cluster from command line by issuing `spark-submit` command which submit a Spark job to the cluster.  But from PyCharm or other IDE on a local laptop or PC, `spark-submit` cannot be used to kick off a Spark job.  Instead, follow these steps to set up a Run Configuration of pyspark_xray's demo_app on PyCharm
 
@@ -113,7 +113,7 @@ You run Spark application on a cluster from command line by issuing `spark-submi
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/driver-run-config.png[driver run configuration]
 
-## Debug Locally
+### Debug Locally
 
 In main.py, for demonstration purpose, RDD transformation functions are called at two places
 
@@ -126,7 +126,7 @@ Corresponding to them, we set break points in  `calc_mthly_payment` and `calc_in
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-utils_s-calc-interest.png[stopped at calc_interest RDD transformation function]
 
-# References
+## References
 
 PySpark Resources:
 
