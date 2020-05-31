@@ -1,6 +1,7 @@
 from demo_app import const
 from demo_app import utils_s as utils_slave
 from pyspark_xray import utils_m as utils_debugger
+from pyspark_xray import const as const_xray
 from demo_app import utils_m as utils_master
 
 # this app calculates total_cost and monthly payment amount based on input data
@@ -60,7 +61,7 @@ class Calculator(object):
         rdd_int = utils_debugger.wrapper_mapvalues(input_rdd=loan_rdd
                 , lambda_func=lambda x: utils_slave.calc_interest(row=x)
                                                , spark_context=self.spark_context
-                                               , debug_flag=const.CONST_BOOL_LOCAL_MODE)
+                                               , debug_flag=const_xray.CONST_BOOL_LOCAL_MODE)
         # normalize rdd from key-value studded format to columnized format
         rdd_int2 = rdd_int.map(lambda x: x[1])
         df_int = rdd_int2.toDF()

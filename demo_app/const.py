@@ -1,14 +1,10 @@
 import os
-from sys import platform
+from pyspark_xray import const
 from pyspark.sql.types import *
 
 CONST_PATH_DEMO_APP=os.path.dirname(os.path.abspath( __file__ ))
-if os.name=="nt" or platform=="darwin":    #platofmr==darwin is mac
-    CONST_BOOL_LOCAL_MODE=True
-else:
-    CONST_BOOL_LOCAL_MODE=False
 
-if CONST_BOOL_LOCAL_MODE:
+if const.CONST_BOOL_LOCAL_MODE:
     CONST_DICT_INPUT_PATHS_DEFAULT = {
         "input_loans": os.path.join(CONST_PATH_DEMO_APP, "data", "input", "loans.csv")
     }

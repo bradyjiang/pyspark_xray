@@ -21,7 +21,7 @@ setup(
     name='pyspark_xray',
     version=get_version(),
     author='Brady Jiang',
-    author_email='shopmarkco@gmail.com',
+    author_email='savenowclub@gmail.com',
     url='https://github.com/bradyjiang/pyspark_xray',
     description=('pyspark_xray is a diagnostic tool, in the form of Python library,'
                  ' for pyspark developers to debug and troubleshoot PySpark '
