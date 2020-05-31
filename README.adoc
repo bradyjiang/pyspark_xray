@@ -1,51 +1,25 @@
 # pyspark-xray
 :toc:
 
+last updated: May 31, 2020
+
 pyspark_xray is a diagnostic tool, in the form of Python library, for pyspark developers to debug and troubleshoot PySpark applications locally, specifically it enables local debugging of PySpark RDD transformation functions.
 
-The purpose of developing pyspark_xray is to develop a PySpark development framework that enables PySpark application developers to do local debugging using sampled input data and remote production running using the entire input data using SAME code base without any modification.
+The purpose of developing pyspark_xray is to create a development framework that enables PySpark application developers to debug and troubleshoot locally and do production runs remotely using the same code base.
 
-This repository provides Python library and a <<demo-app, demo PySpark application>> for users to setup local dev environment on PyCharm for running, testing and debugging Spark applications as well as their RDD transformation functions.
+## Problem
 
-## Benefits
-Aside from PyCharm debugging capabilties, this package provides the following incremental debugging capabilities to Spark application developers:
+For developers, it's very important to do step-by-step debugging of every part of an application locally in order to diagnose, troubleshoot and solve problems during development.  Given the facts that Spark framework is designed to run on a cluster of computers rather than a single node, and part of Spark code runs on master node and remaining part runs on slave nodes, currently Spark developer community does not have a proper tool to locally run and debug Spark application code that runs on slave nodes.  Spark code that runs on slave nodes usually include lambda functions as parameters for https://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations[RDD transformations].
 
-* instructions and documentation for setting up PyCharm-based local debugger for Spark application
-* code library to step into RDD/Dataframe native lambda functions using wrapper functions for RDD/Dataframe native lambda functions
-* code library / instructions for automatically switching between local and remote Spark run environments using same code base
+## Solution
 
-## Setup
+https://github.com/bradyjiang/pyspark_xray/tree/master/pyspark_xray[**pyspark_xray**] library enables developers to locally debug (step into) 100% of Spark application code, not only code that runs on master node, but also code that runs on slave nodes, using PyCharm and other popular IDE such as VSCode.  After integrating your PySpark application with pyspark_xray library, with the use of `CONST_BOOL_LOCAL_MODE` variable from https://github.com/bradyjiang/pyspark_xray/blob/master/pyspark_xray/const.py[const.py] in your Spark code base, you can locally debug and remotely execute your Spark application using the same code base.
 
-last updated: May 20, 2020
-
-### required dependencies
-
-* pyspark_xray (this package)
-* spark
-* pyspark
-* java
-* PyCharm
-
-### Preparation Steps
-
-* Open command line, kick off `java` command, if you get an error, then download and install **java** (version 1.8.0_221 as of April 2020)
-* If you don't have it, download and install **PyCharm** Community edition (version 2020.1 as of April 2020)
-* If you don't have it, download and install Anaconda Python 3.7 runtime
-* Download and install **spark** latest Pre-built for Apache Hadoop (spark-2.4.5-bin-hadoop2.7 as of April 2020, 200+MB size) locally
-  * **Windows**:
-    * if you don't have unzip tool, please download and install 7zip, a free tool to zip/unzip files
-    * extract contents of spark tgz file to c:\spark-x.x.x-bin-hadoopx.x folder
-    * follow the steps in https://medium.com/big-data-engineering/how-to-install-apache-spark-2-x-in-your-pc-e2047246ffc3[this tutorial]
-        * install `winutils.exe` into `c:\spark-x.x.x-bin-hadoopx.x\bin` folder, without this executable, you will run into error when writing engine output
-        * add `HADOOP_HOME` environment variable, and point it to `c:\spark-x.x.x-bin-hadoopx.x` path
-  * **Mac**:
-    * extract contents of spark tgz file to \Users\[USERNAME]\spark-x.x.x-bin-hadoopx.x folder
-* install **pyspark** by `pip install pyspark` or `conda install pyspark`
-
+check out <<demo-app, demo app>> section for an example use case.
 
 # Demo App
 
-The demo_app folder contains a simple PySpark application that takes data of 11 loans into Spark Dataframe and then converts it to RDD, then calculate interest amount for each loan by calling `calc_mthly_payment` and `calc_interest` RDD transformation functions to calculate monthly payment amount and total interest amount for each loan respectively, see input and output below
+The https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app[**demo_app**] folder contains a simple PySpark application that takes data of 11 loans into a Spark RDD, then calculates interest amount for each loan by passing `calc_mthly_payment` and `calc_interest` lambda functions respectively to RDD `mapValues` transformation to calculate monthly payment amount and total interest amount for each loan respectively, see input and output below
 
 ```
 ingested 11 loans
@@ -101,17 +75,43 @@ interest output =
 +-----------------+-------+
 ```
 
-## Setup
+## Dependencies
 
-From command line, users issue `spark-submit` command which submit a Spark job to cluster, within PyCharm, `spark-submit` cannot be used to kick off a Spark job.
+* pyspark_xray (this package)
+* spark
+* pyspark
+* java
+* PyCharm
 
-* use Github Desktop or other git tools to clone `pyspark_xray` locally
+## Preparation
+
+* Open command line, kick off `java` command, if you get an error, then download and install **java** (version 1.8.0_221 as of April 2020)
+* If you don't have it, download and install **PyCharm** Community edition (version 2020.1 as of April 2020)
+* If you don't have it, download and install Anaconda Python 3.7 runtime
+* Download and install **spark** latest Pre-built for Apache Hadoop (spark-2.4.5-bin-hadoop2.7 as of April 2020, 200+MB size) locally
+  ** **Windows**:
+    *** if you don't have unzip tool, please download and install 7zip, a free tool to zip/unzip files
+    *** extract contents of spark tgz file to c:\spark-x.x.x-bin-hadoopx.x folder
+    *** follow the steps in https://medium.com/big-data-engineering/how-to-install-apache-spark-2-x-in-your-pc-e2047246ffc3[this tutorial]
+        **** install `winutils.exe` into `c:\spark-x.x.x-bin-hadoopx.x\bin` folder, without this executable, you will run into error when writing engine output
+  ** **Mac**:
+    *** extract contents of spark tgz file to \Users\[USERNAME]\spark-x.x.x-bin-hadoopx.x folder
+* install **pyspark** by `pip install pyspark` or `conda install pyspark`
+
+## Run Configuration
+
+You run Spark application on a cluster from command line by issuing `spark-submit` command which submit a Spark job to the cluster.  But from PyCharm or other IDE on a local laptop or PC, `spark-submit` cannot be used to kick off a Spark job.  Instead, follow these steps to set up a Run Configuration of pyspark_xray's demo_app on PyCharm
+
+* Set Environment Variables:
+** set `HADOOP_HOME` value to `C:\spark-2.4.5-bin-hadoop2.7`
+** set `SPARK_HOME` value to `C:\spark-2.4.5-bin-hadoop2.7`
+* use Github Desktop or other git tools to clone `pyspark_xray` from Github
 * PyCharm > Open pyspark_xray as project
 * Open PyCharm > Run > Edit Configurations > Defaults > Python and enter the following values:
-  * **Environment variables** (Windows): `PYTHONUNBUFFERED=1;PYSPARK_PYTHON=python;PYTHONPATH=$SPARK_HOME/python;PYSPARK_SUBMIT_ARGS=pyspark-shell;HADOOP_HOME=C:\spark-2.4.5-bin-hadoop2.7`
-  * click Apply or OK
-* Open PyCharm > Run > Edit Configurations, create a new Python configuration, point the script to the path of `driver.py` of pyspark_xray > demo_app
-* click Appy or OK
+  ** **Environment variables** (Windows): `PYTHONUNBUFFERED=1;PYSPARK_PYTHON=python;PYTHONPATH=$SPARK_HOME/python;PYSPARK_SUBMIT_ARGS=pyspark-shell;`
+* Open PyCharm > Run > Edit Configurations, create a new Python configuration, point the script to the path of `driver.py` of pyspark_xray > demo_app (see screen shot below)
+
+image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/driver-run-config.png[driver run configuration]
 
 ## Debug Locally
 
