@@ -19,7 +19,7 @@ check out <<demo-app, demo app>> section for an example use case.
 
 ## Demo App
 
-The https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app[**demo_app**] folder contains a simple PySpark application that takes data of 11 loans into a Spark RDD, then calculates interest amount for each loan by passing `calc_mthly_payment` and `calc_interest` lambda functions respectively to RDD `mapValues` transformation to calculate monthly payment amount and total interest amount for each loan respectively, see input and output below
+The https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app[**demo_app**] folder contains a simple PySpark application that takes data of 11 loans into a Spark RDD, then calculates interest amount for each loan by passing `calc_mthly_payment` and `calc_interest` lambda functions respectively to 2 types of RDD `mapValues` transformation functions to calculate monthly payment amount and total interest amount for each loan respectively, see input and output below
 
 ```
 ingested 11 loans
@@ -75,6 +75,14 @@ interest output =
 +-----------------+-------+
 ```
 
+### Code Structure
+
+* const.py, defines a couple of variables shared by multiple modules
+* driver.py, main entry point of Spark application, creates SparkConf and SparkSession objects and triggers Spark application
+* main.py, the backbone of Spark application, runs on master node, read data into RDD, then perform RDD transformations, then print output
+* utils_m.py, utility functions that run on master node, mainly for data ingestion purpose
+* utils_s.py, lambda functions that are passed as parameters to RDD transformation functions, run on slave nodes
+
 ### Dependencies
 
 * pyspark_xray (this package)
@@ -113,16 +121,19 @@ You run Spark application on a cluster from command line by issuing `spark-submi
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/driver-run-config.png[driver run configuration]
 
+
 ### Debug Locally
 
-In main.py, for demonstration purpose, RDD transformation functions are called at two places
+In main.py, after loan data is ingested into RDD, two types of RDD transformation functions are called in order to demonstrate difference of debugging capability brought by pyspark_xray's RDD transformation wrappers vs native RDD transformation functions.
 
-* first calling native RDD mapValues function and `calc_mthly_interest` function like this `rdd_pmt = loan_rdd.mapValues(lambda x: utils_slave.calc_mthly_payment(row=x))`
-* second calling pyspark_xray's wrapper of RDD mapValues `wrapper_mapvalues` and `calc_interest` function like this `utils_debugger.wrapper_mapvalues`
+* native RDD `mapValues` transformation function is called with `calc_mthly_interest` as lambda function parameter
+** `rdd_pmt = loan_rdd.mapValues(lambda x: utils_slave.calc_mthly_payment(row=x))`
+* pyspark_xray's `wrapper_mapvalues` function, i.e. RDD `mapValues` transformation wrapper function, is called with `calc_interest` as lambda function parameter
+** `utils_debugger.wrapper_mapvalues`
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-main-wrapper-mapvalues.png[stopped at main wrapper mapvalues]
 
-Corresponding to them, we set break points in  `calc_mthly_payment` and `calc_interest` lambda functions respectively in utils_s.py.  Among these 2 break points, only the 2nd one will be stopped as shown below, the 1st one will NEVER be stopped
+Corresponding to them, we set break points in  `calc_mthly_payment` and `calc_interest` lambda functions respectively in utils_s.py.  Among these 2 break points, only the 2nd one will be stopped as shown below, the 1st one will NEVER be stopped.
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-utils_s-calc-interest.png[stopped at calc_interest RDD transformation function]
 
