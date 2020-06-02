@@ -121,10 +121,9 @@ You run Spark application on a cluster from command line by issuing `spark-submi
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/driver-run-config.png[driver run configuration]
 
-
 ### Debug Locally
 
-In main.py, after loan data is ingested into RDD, two types of RDD transformation functions are called one after the other to demonstrate difference of debugging capability between pyspark_xray's RDD transformation wrappers vs native RDD transformation functions.
+In https://github.com/bradyjiang/pyspark_xray/blob/master/demo_app/main.py[main.py], after loan data is ingested into RDD, two types of RDD transformation functions are called one after the other to demonstrate difference of debugging capability between pyspark_xray's RDD transformation wrappers vs native RDD transformation functions.
 
 At first, native RDD `mapValues` transformation function is called with `calc_mthly_interest` as lambda function parameter
 
@@ -141,7 +140,7 @@ rdd_int = utils_debugger.wrapper_mapvalues(input_rdd=loan_rdd
         , debug_flag=const_xray.CONST_BOOL_LOCAL_MODE)
 ```
 
-Correspondingly, break points are set within  `calc_mthly_payment` and `calc_interest` lambda functions respectively in utils_s.py.  **NOTE**: these are break points that were not stoppable before adopting pyspark_xray.
+Correspondingly, break points are set within  `calc_mthly_payment` and `calc_interest` lambda functions respectively in https://github.com/bradyjiang/pyspark_xray/blob/master/demo_app/utils_s.py[utils_s.py].  **NOTE**: these are break points that were not stoppable before adopting pyspark_xray.
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-main-wrapper-mapvalues.png[stopped at main wrapper mapvalues]
 
