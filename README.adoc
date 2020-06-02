@@ -1,11 +1,11 @@
-# pyspark-xray
+# pyspark_xray
 :toc:
 
-last updated: May 31, 2020
+last updated: June 1, 2020
 
 pyspark_xray is a diagnostic tool, in the form of Python library, for pyspark developers to debug and troubleshoot PySpark applications locally, specifically it enables local debugging of PySpark RDD transformation functions.
 
-The purpose of developing pyspark_xray is to create a development framework that enables PySpark application developers to debug and troubleshoot locally and do production runs remotely using the same code base.
+The purpose of developing pyspark_xray is to create a development framework that enables PySpark application developers to **debug and troubleshoot locally and do production runs remotely using the same code base** of a pyspark application.  For the part of debugging Spark application code locally, pyspark_xray specifically provides **capability of locally debugging Spark application code that runs on slave nodes**, the missing of this capability is an unfilled gap for Spark application developers right now.
 
 ## Problem
 
@@ -13,7 +13,7 @@ For developers, it's very important to do step-by-step debugging of every part o
 
 ## Solution
 
-https://github.com/bradyjiang/pyspark_xray/tree/master/pyspark_xray[**pyspark_xray**] library enables developers to locally debug (step into) 100% of Spark application code, not only code that runs on master node, but also code that runs on slave nodes, using PyCharm and other popular IDE such as VSCode.  After integrating your PySpark application with pyspark_xray library, with the use of `CONST_BOOL_LOCAL_MODE` variable from https://github.com/bradyjiang/pyspark_xray/blob/master/pyspark_xray/const.py[const.py] in your Spark code base, you can locally debug and remotely execute your Spark application using the same code base.
+https://github.com/bradyjiang/pyspark_xray/tree/master/pyspark_xray[**pyspark_xray**] library enables developers to <<debug-locally, locally debug>> (step into) 100% of Spark application code, not only code that runs on master node, but also code that runs on slave nodes, using PyCharm and other popular IDE such as VSCode.  After integrating your PySpark application with pyspark_xray library, with the use of `CONST_BOOL_LOCAL_MODE` variable from https://github.com/bradyjiang/pyspark_xray/blob/master/pyspark_xray/const.py[const.py] in your Spark code base, you can locally debug and remotely execute your Spark application using the same code base.
 
 check out <<demo-app, demo app>> section for an example use case.
 
@@ -124,16 +124,28 @@ image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/d
 
 ### Debug Locally
 
-In main.py, after loan data is ingested into RDD, two types of RDD transformation functions are called in order to demonstrate difference of debugging capability brought by pyspark_xray's RDD transformation wrappers vs native RDD transformation functions.
+In main.py, after loan data is ingested into RDD, two types of RDD transformation functions are called one after the other to demonstrate difference of debugging capability between pyspark_xray's RDD transformation wrappers vs native RDD transformation functions.
 
-* native RDD `mapValues` transformation function is called with `calc_mthly_interest` as lambda function parameter
-** `rdd_pmt = loan_rdd.mapValues(lambda x: utils_slave.calc_mthly_payment(row=x))`
-* pyspark_xray's `wrapper_mapvalues` function, i.e. RDD `mapValues` transformation wrapper function, is called with `calc_interest` as lambda function parameter
-** `utils_debugger.wrapper_mapvalues`
+At first, native RDD `mapValues` transformation function is called with `calc_mthly_interest` as lambda function parameter
+
+```python
+rdd_pmt = loan_rdd.mapValues(lambda x: utils_slave.calc_mthly_payment(row=x))
+```
+
+Then pyspark_xray's wrapper function of RDD `mapValues` transformation function, i.e. `wrapper_mapvalues` function, is called with `calc_interest` as lambda function parameter
+
+```python
+rdd_int = utils_debugger.wrapper_mapvalues(input_rdd=loan_rdd
+        , lambda_func=lambda x: utils_slave.calc_interest(row=x)
+        , spark_context=self.spark_context
+        , debug_flag=const_xray.CONST_BOOL_LOCAL_MODE)
+```
+
+Correspondingly, break points are set within  `calc_mthly_payment` and `calc_interest` lambda functions respectively in utils_s.py.  **NOTE**: these are break points that were not stoppable before adopting pyspark_xray.
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-main-wrapper-mapvalues.png[stopped at main wrapper mapvalues]
 
-Corresponding to them, we set break points in  `calc_mthly_payment` and `calc_interest` lambda functions respectively in utils_s.py.  Among these 2 break points, only the 2nd one will be stopped as shown below, the 1st one will NEVER be stopped.
+Now start debugging demo_app and the break point set in `calc_mthly_payment` function will be skipped, but break point in `calc_interest` function will be stopped, see below.  The reason is because `calc_interest` lamdba function was passed to pyspark_xray's wrapper function of RDD `mapValues` transformation, while `calc_mthly_payment` function was passed to original RDD `mapValues` transformation.
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-utils_s-calc-interest.png[stopped at calc_interest RDD transformation function]
 
