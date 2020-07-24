@@ -3,6 +3,12 @@
 
 last updated: June 1, 2020
 
+If you develop PySpark applications, you know that PySpark application code are made up of two categories: code that executes on master node and code that executes on worker nodes.  While master node code can be accessed by a debugger, worker node code is like a blackbox and not accessible by debugger.
+
+A lot of posts on web have covered steps of debugging PySpark code that executes on master node, but when it comes to the question of debugging PySpark code that runs on worker nodes, no solution can be found as of July 2020, most people refer to this part of code either as a blackbox or no need to do debugging.  
+
+# Overview
+
 pyspark_xray is a diagnostic tool, in the form of Python library, for pyspark developers to debug and troubleshoot PySpark applications locally, specifically it enables local debugging of PySpark RDD transformation functions.
 
 The purpose of developing pyspark_xray is to create a development framework that enables PySpark application developers to **debug and troubleshoot locally and do production runs remotely using the same code base** of a pyspark application.  For the part of debugging Spark application code locally, pyspark_xray specifically provides **capability of locally debugging Spark application code that runs on slave nodes**, the missing of this capability is an unfilled gap for Spark application developers right now.
