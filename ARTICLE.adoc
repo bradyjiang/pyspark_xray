@@ -1,0 +1,10 @@
+# Debug PySpark using PyCharm
+:toc:
+
+# Introduction
+
+If you debug PySpark applications, you know that part of PySpark application code is like a blackbox and not accessible by debugger.  These are codes that get executed on worker nodes.
+
+# Reference
+
+* https://www.edureka.co/community/53204/how-to-call-the-debug-mode-in-pyspark#:~:text=PyCharm%20provides%20Python%20Debug%20Server,and%20choose%20Python%20Remote%20Debug[pycharm debug pyspark]
