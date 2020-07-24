@@ -1,11 +1,11 @@
 # pyspark_xray
 :toc:
 
-last updated: June 1, 2020
+last updated: July 24, 2020
 
 If you develop PySpark applications, you know that PySpark application code are made up of two categories: code that executes on master node and code that executes on worker nodes.  While master node code can be accessed by a debugger, worker node code is like a blackbox and not accessible by debugger.
 
-A lot of posts on web have covered steps of debugging PySpark code that executes on master node, but when it comes to the question of debugging PySpark code that runs on worker nodes, no solution can be found as of July 2020, most people refer to this part of code either as a blackbox or no need to do debugging.  
+A lot of posts on web have covered steps of debugging PySpark code that executes on master node, but when it comes to the question of debugging PySpark code that runs on worker nodes, no solution can be found as of July 2020, most people refer to this part of code either as a blackbox or no need to do debugging.
 
 # Overview
 
