@@ -13,17 +13,17 @@ pyspark_xray is a diagnostic tool, in the form of Python library, for pyspark de
 
 The purpose of developing pyspark_xray is to create a development framework that enables PySpark application developers to **debug and troubleshoot locally and do production runs remotely using the same code base** of a pyspark application.  For the part of debugging Spark application code locally, pyspark_xray specifically provides **capability of locally debugging Spark application code that runs on slave nodes**, the missing of this capability is an unfilled gap for Spark application developers right now.
 
-## Problem
+# Problem
 
 For developers, it's very important to do step-by-step debugging of every part of an application locally in order to diagnose, troubleshoot and solve problems during development.  Given the facts that Spark framework is designed to run on a cluster of computers rather than a single node, and part of Spark code runs on master node and remaining part runs on slave nodes, currently Spark developer community does not have a proper tool to locally run and debug Spark application code that runs on slave nodes.  Spark code that runs on slave nodes usually include lambda functions as parameters for https://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations[RDD transformations].
 
-## Solution
+# Solution
 
 https://github.com/bradyjiang/pyspark_xray/tree/master/pyspark_xray[**pyspark_xray**] library enables developers to <<debug-locally, locally debug>> (step into) 100% of Spark application code, not only code that runs on master node, but also code that runs on slave nodes, using PyCharm and other popular IDE such as VSCode.  After integrating your PySpark application with pyspark_xray library, with the use of `CONST_BOOL_LOCAL_MODE` variable from https://github.com/bradyjiang/pyspark_xray/blob/master/pyspark_xray/const.py[const.py] in your Spark code base, you can locally debug and remotely execute your Spark application using the same code base.
 
 check out <<demo-app, demo app>> section for an example use case.
 
-## Demo App
+# Demo App
 
 The https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app[**demo_app**] folder contains a simple PySpark application that takes data of 11 loans into a Spark RDD, then calculates interest amount for each loan by passing `calc_mthly_payment` and `calc_interest` lambda functions respectively to 2 types of RDD `mapValues` transformation functions to calculate monthly payment amount and total interest amount for each loan respectively, see input and output below
 
@@ -81,7 +81,7 @@ interest output =
 +-----------------+-------+
 ```
 
-### Code Structure
+## Code Structure
 
 * const.py, defines a couple of variables shared by multiple modules
 * driver.py, main entry point of Spark application, creates SparkConf and SparkSession objects and triggers Spark application
@@ -89,7 +89,7 @@ interest output =
 * utils_m.py, utility functions that run on master node, mainly for data ingestion purpose
 * utils_s.py, lambda functions that are passed as parameters to RDD transformation functions, run on slave nodes
 
-### Dependencies
+## Dependencies
 
 * pyspark_xray (this package)
 * spark
@@ -97,7 +97,7 @@ interest output =
 * java
 * PyCharm
 
-### Preparation
+## Preparation
 
 * Open command line, kick off `java` command, if you get an error, then download and install **java** (version 1.8.0_221 as of April 2020)
 * If you don't have it, download and install **PyCharm** Community edition (version 2020.1 as of April 2020)
@@ -112,7 +112,7 @@ interest output =
     *** extract contents of spark tgz file to \Users\[USERNAME]\spark-x.x.x-bin-hadoopx.x folder
 * install **pyspark** by `pip install pyspark` or `conda install pyspark`
 
-### Run Configuration
+## Run Configuration
 
 You run Spark application on a cluster from command line by issuing `spark-submit` command which submit a Spark job to the cluster.  But from PyCharm or other IDE on a local laptop or PC, `spark-submit` cannot be used to kick off a Spark job.  Instead, follow these steps to set up a Run Configuration of pyspark_xray's demo_app on PyCharm
 
@@ -127,7 +127,7 @@ You run Spark application on a cluster from command line by issuing `spark-submi
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/driver-run-config.png[driver run configuration]
 
-### Debug Locally
+## Debug Locally
 
 In https://github.com/bradyjiang/pyspark_xray/blob/master/demo_app/main.py[main.py], after loan data is ingested into RDD, two types of RDD transformation functions are called one after the other to demonstrate difference of debugging capability between pyspark_xray's RDD transformation wrappers vs native RDD transformation functions.
 
@@ -154,7 +154,7 @@ Now start debugging demo_app and the break point set in `calc_mthly_payment` fun
 
 image::https://github.com/bradyjiang/pyspark_xray/raw/master/docs/screen-shots/stopped-utils_s-calc-interest.png[stopped at calc_interest RDD transformation function]
 
-## References
+# References
 
 PySpark Resources:
 
