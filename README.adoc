@@ -91,11 +91,13 @@ interest output =
 
 ## Dependencies
 
+as of August 2020
+
 * pyspark_xray (this package)
-* spark
-* pyspark
-* java
-* PyCharm
+* spark: v2.4.5
+* pyspark: v2.4.5
+* java: v1.8.0
+* PyCharm: Community v2020.3
 
 ## Preparation
 
