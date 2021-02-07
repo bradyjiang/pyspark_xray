@@ -91,11 +91,11 @@ interest output =
 
 ## Dependencies
 
-as of August 2020
+as of Febuary 2021
 
 * pyspark_xray (this package)
-* spark: v2.4.5
-* pyspark: v2.4.5
+* spark: v3.0.1
+* pyspark: v3.0.1
 * java: v1.8.0
 * PyCharm: Community v2020.3
 
@@ -112,15 +112,15 @@ as of August 2020
         **** install `winutils.exe` into `c:\spark-x.x.x-bin-hadoopx.x\bin` folder, without this executable, you will run into error when writing engine output
   ** **Mac**:
     *** extract contents of spark tgz file to \Users\[USERNAME]\spark-x.x.x-bin-hadoopx.x folder
-* install **pyspark** by `pip install pyspark` or `conda install pyspark`
+* install **pyspark** by `pip install pyspark` or `conda install pyspark`, make sure version of pyspark match the version of spark you use
 
 ## Run Configuration
 
 You run Spark application on a cluster from command line by issuing `spark-submit` command which submit a Spark job to the cluster.  But from PyCharm or other IDE on a local laptop or PC, `spark-submit` cannot be used to kick off a Spark job.  Instead, follow these steps to set up a Run Configuration of pyspark_xray's demo_app on PyCharm
 
 * Set Environment Variables:
-** set `HADOOP_HOME` value to `C:\spark-2.4.5-bin-hadoop2.7`
-** set `SPARK_HOME` value to `C:\spark-2.4.5-bin-hadoop2.7`
+** set `HADOOP_HOME` value to `C:\spark-x.x.x-bin-hadoop2.7`
+** set `SPARK_HOME` value to `C:\spark-x.x.x-bin-hadoop2.7`
 * use Github Desktop or other git tools to clone `pyspark_xray` from Github
 * PyCharm > Open pyspark_xray as project
 * Open PyCharm > Run > Edit Configurations > Defaults > Python and enter the following values:
