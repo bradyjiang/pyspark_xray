@@ -25,8 +25,9 @@ setup(
     url='https://github.com/bradyjiang/pyspark_xray',
     description=('pyspark_xray is a diagnostic tool, in the form of Python library,'
                  ' for pyspark developers to debug and troubleshoot PySpark '
-                 'applications locally, specifically it enables '
-                 'local debugging of PySpark RDD transformation functions.'),
+                 'applications locally, as of Feb 2021, it enables local debugging of '
+                 'PySpark RDD.map, RDD.mapValues, and DataFrame.mapInPandas transformation functions. '
+                 'To request support for more PySpark transformation functions, please create an issue on Github repo'),
     long_description=readme(),
     license='Apache License',
     packages=find_packages(),
