@@ -58,9 +58,9 @@ class Calculator(object):
         df_pmt.show()
         # calling pyspark_xray RDD.mapValues wrapper function
         # lambda function utils_slave.calc_interest CAN be debugged locally
-        rdd_int = utils_debugger.wrapper_mapvalues(input_rdd=loan_rdd
-                , lambda_func=lambda x: utils_slave.calc_interest(row=x)
-                                               , spark_context=self.spark_context
+        rdd_int = utils_debugger.wrapper_rdd_mapvalues(input_rdd=loan_rdd
+                , func=lambda x: utils_slave.calc_interest(row=x)
+                                               , spark_session=self.spark_session
                                                , debug_flag=const_xray.CONST_BOOL_LOCAL_MODE)
         # normalize rdd from key-value studded format to columnized format
         rdd_int2 = rdd_int.map(lambda x: x[1])

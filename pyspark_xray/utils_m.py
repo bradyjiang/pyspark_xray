@@ -41,7 +41,7 @@ def wrapper_rdd_map(**kwargs):
     :return: output Spark RDD
     """
     input_rdd = kwargs.get("input_rdd", None)
-    lambda_func = kwargs.get("lambda_func", None)
+    lambda_func = kwargs.get("func", None)
     spark_session = kwargs.get("spark_session", None)
     spark_context = spark_session.sparkContext
     debug_flag = kwargs.get("debug_flag", False)
@@ -63,7 +63,7 @@ def wrapper_rdd_mapvalues(**kwargs):
     :return: output Spark RDD
     """
     input_rdd = kwargs.get("input_rdd", None)
-    lambda_func = kwargs.get("lambda_func", None)
+    lambda_func = kwargs.get("func", None)
     spark_session = kwargs.get("spark_session", None)
     spark_context = spark_session.sparkContext
     debug_flag = kwargs.get("debug_flag", False)
