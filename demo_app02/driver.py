@@ -5,6 +5,9 @@ import pandas as pd
 import pyspark
 from pyspark.sql import Row
 from pyspark.sql.types import StructType, StructField, IntegerType,StringType
+from pyspark_xray import utils_m as utils_debugger
+from pyspark_xray import const as const_xray
+
 spark = pyspark.sql.SparkSession.builder.appName("test") \
     .master('local[*]') \
     .getOrCreate()
@@ -23,13 +26,19 @@ jsons = sc.parallelize(rdd_list)
 respond_sdf = spark.createDataFrame(jsons, schema)
 
 # Pandas UDF
+# references: https://spark.apache.org/docs/latest/sql-pyspark-pandas-with-arrow.html#map and https://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.DataFrame.mapInPandas
 def pandas_function(url_json):
 # Here I want to place breakpoint
     for df in url_json:
         yield pd.DataFrame(eval(df['content'][0]))
 
 # Pnadas UDF transformation applied to respond_sdf
-transformed_df = respond_sdf.mapInPandas(pandas_function, "api string, A int, B int")
+# transformed_df = respond_sdf.mapInPandas(pandas_function, "api string, A int, B int")
+transformed_df = utils_debugger.wrapper_sdf_mapinvalues(input_sdf=respond_sdf
+                                           , func=pandas_function
+                                           , spark_session=spark
+                                           , debug_flag=const_xray.CONST_BOOL_LOCAL_MODE
+                                            , output_schema="api string, A int, B int")
 transformed_df.show()
 
 """
