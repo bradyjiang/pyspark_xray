@@ -2,11 +2,11 @@
 spark debugger functions that run on master node of a cluster
 """
 import pandas as pd
-def wrapper_sdf_mapinvalues(**kwargs):
+def wrapper_sdf_mapInPandas(**kwargs):
     """
-    pyspark_xray wrapper function of Spark DataFrame.mapInValues which wraps DataFrame.mapInValues on cluster and locally debuggable version on local
+    pyspark_xray wrapper function of Spark DataFrame.mapInPandas which wraps DataFrame.mapInPandas on cluster and locally debuggable version on local
     expect input Spark DataFrame
-    :param func: pandas UDF function that is passed into Spark DF mapInValues function
+    :param func: pandas UDF function that is passed into Spark DF mapInPandas function
     :return: output Spark DataFrame
     """
     input_sdf = kwargs.get("input_sdf", None)
@@ -30,7 +30,7 @@ def wrapper_sdf_mapinvalues(**kwargs):
         # convert combined pandas DataFrame into a Spark DataFrame
         output_sdf = spark_session.createDataFrame(data=combined_pdf, schema=output_schema)
     else:
-        output_sdf = input_sdf.mapInValues(func=func, schema=output_schema)
+        output_sdf = input_sdf.mapInPandas(func=func, schema=output_schema)
     return output_sdf
 
 def wrapper_rdd_map(**kwargs):
