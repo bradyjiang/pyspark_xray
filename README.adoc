@@ -45,7 +45,7 @@ pyspark_xray introduces these wrapper functions (defined in https://github.com/b
 
 ### wrapper_rdd_map for RDD.map
 
-http://spark.apache.org/docs/latest/api/python/pyspark.html?highlight=mapvalues#pyspark.RDD.map[`RDD.map`] function returns a new RDD by applying a function to each element of the RDD.
+http://spark.apache.org/docs/latest/api/python/pyspark.html?highlight=mapvalues#pyspark.RDD.map[RDD.map] function returns a new RDD by applying a function to each element of the RDD.
 
 `wrapper_rdd_map` wraps RDD.map function so that it runs the original function when `CONST_BOOL_LOCAL_MODE` is False, and runs locally debuggable re-written version when `CONST_BOOL_LOCAL_MODE` is True.
 
@@ -53,7 +53,7 @@ Check out https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app02[demo
 
 ### wrapper_rdd_mapvalues for RDD.mapValues
 
-http://spark.apache.org/docs/latest/api/python/pyspark.html?highlight=mapvalues#pyspark.RDD.mapValues[`RDD.mapValues`] function passes each value in the key-value pair RDD through a map function without changing the keys; this also retains the original RDD’s partitioning.
+http://spark.apache.org/docs/latest/api/python/pyspark.html?highlight=mapvalues#pyspark.RDD.mapValues[RDD.mapValues] function passes each value in the key-value pair RDD through a map function without changing the keys; this also retains the original RDD’s partitioning.
 
 `wrapper_rdd_mapvalues` wraps RDD.mapValues function so that it runs the original function when `CONST_BOOL_LOCAL_MODE` is False, and runs locally debuggable re-written version when `CONST_BOOL_LOCAL_MODE` is True.
 
@@ -63,7 +63,7 @@ Check out https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app02[demo
 
 ### wrapper_sdf_mapinpandas for DataFrame.mapInPandas
 
-https://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.DataFrame.mapInPandas[`DataFrame.mapInPandas`] function maps an iterator of batches in the current DataFrame using a Python native function that takes and outputs a pandas DataFrame, and returns the result as a DataFrame.
+https://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.DataFrame.mapInPandas[DataFrame.mapInPandas] function maps an iterator of batches in the current DataFrame using a Python native function that takes and outputs a pandas DataFrame, and returns the result as a DataFrame.
 
 `wrapper_sdf_mapinpandas` wraps Spark DataFrame.mapInPandas function so that it runs the original function when `CONST_BOOL_LOCAL_MODE` is False, and runs locally debuggable re-written version when `CONST_BOOL_LOCAL_MODE` is True.
 
@@ -191,10 +191,10 @@ rdd_pmt = loan_rdd.mapValues(lambda x: utils_slave.calc_mthly_payment(row=x))
 Then pyspark_xray's wrapper function of RDD `mapValues` transformation function, i.e. `wrapper_mapvalues` function, is called with `calc_interest` as lambda function parameter
 
 ```python
-rdd_int = utils_debugger.wrapper_mapvalues(input_rdd=loan_rdd
-        , lambda_func=lambda x: utils_slave.calc_interest(row=x)
-        , spark_context=self.spark_context
-        , debug_flag=const_xray.CONST_BOOL_LOCAL_MODE)
+rdd_int = utils_debugger.wrapper_rdd_mapvalues(input_rdd=loan_rdd
+                , func=lambda x: utils_slave.calc_interest(row=x)
+                , spark_session=self.spark_session
+                , debug_flag=const_xray.CONST_BOOL_LOCAL_MODE)
 ```
 
 Correspondingly, break points are set within  `calc_mthly_payment` and `calc_interest` lambda functions respectively in https://github.com/bradyjiang/pyspark_xray/blob/master/demo_app/utils_s.py[utils_s.py].  **NOTE**: these are break points that were not stoppable before adopting pyspark_xray.
