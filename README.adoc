@@ -1,29 +1,78 @@
 # pyspark_xray
 :toc:
 
-last updated: July 24, 2020
-
-If you develop PySpark applications, you know that PySpark application code are made up of two categories: code that executes on master node and code that executes on worker nodes.  While master node code can be accessed by a debugger, worker node code is like a blackbox and not accessible by debugger.
-
-A lot of posts on web have covered steps of debugging PySpark code that executes on master node, but when it comes to the question of debugging PySpark code that runs on worker nodes, no solution can be found as of July 2020, most people refer to this part of code either as a blackbox or no need to do debugging.
+last updated: Feb 13, 2021
 
 # Overview
 
-pyspark_xray is a diagnostic tool, in the form of Python library, for pyspark developers to debug and troubleshoot PySpark applications locally, specifically it enables local debugging of PySpark RDD transformation functions.
+https://github.com/bradyjiang/pyspark_xray/tree/master/pyspark_xray[**pyspark_xray**] is a diagnostic tool, in the form of Python library, for pyspark developers to debug and troubleshoot PySpark applications locally, specifically it enables local debugging of PySpark RDD or DataFrame transformation functions that runs on slave nodes.
 
 The purpose of developing pyspark_xray is to create a development framework that enables PySpark application developers to **debug and troubleshoot locally and do production runs remotely using the same code base** of a pyspark application.  For the part of debugging Spark application code locally, pyspark_xray specifically provides **capability of locally debugging Spark application code that runs on slave nodes**, the missing of this capability is an unfilled gap for Spark application developers right now.
 
 # Problem
 
-For developers, it's very important to do step-by-step debugging of every part of an application locally in order to diagnose, troubleshoot and solve problems during development.  Given the facts that Spark framework is designed to run on a cluster of computers rather than a single node, and part of Spark code runs on master node and remaining part runs on slave nodes, currently Spark developer community does not have a proper tool to locally run and debug Spark application code that runs on slave nodes.  Spark code that runs on slave nodes usually include lambda functions as parameters for https://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations[RDD transformations].
+For developers, it's very important to do step-by-step debugging of every part of an application locally in order to diagnose, troubleshoot and solve problems during development.
+
+If you develop PySpark applications, you know that PySpark application code is made up of two categories:
+
+* code that runs on master node
+* code that runs on worker/slave nodes
+
+While code on master node can be accessed by a debugger locally, code on slave nodes is like a blackbox and not accessible locally by debugger.
+
+Plenty tutorials on web have covered steps of debugging PySpark code that runs on master node, but when it comes to  debugging PySpark code that runs on slave nodes, no solution can be found, most people refer to this part of code either as a blackbox or no need to do debugging.
+
+Spark code that runs on slave nodes includes but is not limited to: lambda functions that are passed as input parameter to https://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations[RDD transformation functions].
 
 # Solution
 
-https://github.com/bradyjiang/pyspark_xray/tree/master/pyspark_xray[**pyspark_xray**] library enables developers to <<debug-locally, locally debug>> (step into) 100% of Spark application code, not only code that runs on master node, but also code that runs on slave nodes, using PyCharm and other popular IDE such as VSCode.  After integrating your PySpark application with pyspark_xray library, with the use of `CONST_BOOL_LOCAL_MODE` variable from https://github.com/bradyjiang/pyspark_xray/blob/master/pyspark_xray/const.py[const.py] in your Spark code base, you can locally debug and remotely execute your Spark application using the same code base.
+https://github.com/bradyjiang/pyspark_xray/tree/master/pyspark_xray[**pyspark_xray**] library enables developers to <<debug-locally, locally debug>> (step into) 100% of Spark application code, not only code that runs on master node, but also code that runs on slave nodes, using PyCharm and other popular IDE such as VSCode.
 
-check out <<demo-app, demo app>> section for an example use case.
+This library achieves these capabilties by using the following techniques:
 
-# Demo App
+* **wrapper functions of Spark code on slave nodes**, check out the <<wrapper-functions-for-code-on-slave-nodes, section>> below to learn more details
+* **practice of sampling input data** under local debugging mode in order to fit the application into memory of your standalone local PC/Mac
+** For exmple, say your production input data size has 1 million rows, which obviously cannot fit into one standalone PC/Mac's memory, in order to use pyspark_xray, you may take 100 sample rows as input data as input to debug your application locally using pyspark_xray
+* **usage of a flag to auto-detect local mode**,  `CONST_BOOL_LOCAL_MODE`  from pyspark_xray's https://github.com/bradyjiang/pyspark_xray/blob/master/pyspark_xray/const.py[const.py] auto-detects whether local mode is on or off based on current OS, with values:
+** True: if current OS is Mac or Windows
+** False: otherwise
+
+in your Spark code base,  you can locally debug and remotely execute your Spark application using the same code base.
+
+## Wrapper Functions For Code on Slave Nodes
+
+pyspark_xray introduces these wrapper functions (defined in https://github.com/bradyjiang/pyspark_xray/blob/master/pyspark_xray/utils_m.py[utils_m.py]) of Spark native functions to enable local debugging of code that runs on slave nodes:
+
+### wrapper_rdd_map for RDD.map
+
+http://spark.apache.org/docs/latest/api/python/pyspark.html?highlight=mapvalues#pyspark.RDD.map[`RDD.map`] function returns a new RDD by applying a function to each element of the RDD.
+
+`wrapper_rdd_map` wraps RDD.map function so that it runs the original function when `CONST_BOOL_LOCAL_MODE` is False, and runs locally debuggable re-written version when `CONST_BOOL_LOCAL_MODE` is True.
+
+Check out https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app02[demo_app] for a demo of this wrapper, refer to <<demo-apps, demo apps>> section to learn how to setup.
+
+### wrapper_rdd_mapvalues for RDD.mapValues
+
+http://spark.apache.org/docs/latest/api/python/pyspark.html?highlight=mapvalues#pyspark.RDD.mapValues[`RDD.mapValues`] function passes each value in the key-value pair RDD through a map function without changing the keys; this also retains the original RDD’s partitioning.
+
+`wrapper_rdd_mapvalues` wraps RDD.mapValues function so that it runs the original function when `CONST_BOOL_LOCAL_MODE` is False, and runs locally debuggable re-written version when `CONST_BOOL_LOCAL_MODE` is True.
+
+Like RDD.mapValues, wrapper_rdd_mapvalues wrapper is used on key value pair type of RDDs.
+
+Check out https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app02[demo_app] for a demo of this wrapper, refer to <<demo-apps, demo apps>> section to learn how to setup.
+
+### wrapper_sdf_mapinpandas for DataFrame.mapInPandas
+
+https://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.DataFrame.mapInPandas[`DataFrame.mapInPandas`] function maps an iterator of batches in the current DataFrame using a Python native function that takes and outputs a pandas DataFrame, and returns the result as a DataFrame.
+
+`wrapper_sdf_mapinpandas` wraps Spark DataFrame.mapInPandas function so that it runs the original function when `CONST_BOOL_LOCAL_MODE` is False, and runs locally debuggable re-written version when `CONST_BOOL_LOCAL_MODE` is True.
+
+Check out https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app02[demo_app02] for a demo of this wrapper, refer to <<demo-apps, demo apps>> section to learn how to setup.
+
+# Demo Apps
+
+* https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app[demo_app] demonstrates a sample use case of  `wrapper_rdd_map` and `wrapper_rdd_mapvalues`
+* https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app02[demo_app02] demonstrates a sample use case of `wrapper_sdf_mapinpandas`
 
 The https://github.com/bradyjiang/pyspark_xray/tree/master/demo_app[**demo_app**] folder contains a simple PySpark application that takes data of 11 loans into a Spark RDD, then calculates interest amount for each loan by passing `calc_mthly_payment` and `calc_interest` lambda functions respectively to 2 types of RDD `mapValues` transformation functions to calculate monthly payment amount and total interest amount for each loan respectively, see input and output below
 
