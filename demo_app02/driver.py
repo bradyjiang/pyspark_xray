@@ -34,7 +34,7 @@ def pandas_function(url_json):
 
 # Pnadas UDF transformation applied to respond_sdf
 # transformed_df = respond_sdf.mapInPandas(pandas_function, "api string, A int, B int")
-transformed_df = utils_debugger.wrapper_sdf_mapinvalues(input_sdf=respond_sdf
+transformed_df = utils_debugger.wrapper_sdf_mapinpandas(input_sdf=respond_sdf
                                            , func=pandas_function
                                            , spark_session=spark
                                            , debug_flag=const_xray.CONST_BOOL_LOCAL_MODE
