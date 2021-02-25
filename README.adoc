@@ -211,6 +211,7 @@ PySpark Resources:
 
 * https://www.reddit.com/r/apachespark/[reddit r/apachespark]
 * https://github.com/topics/pyspark[pyspark topic] on Github
-* https://www.google.com/search?q=pyspark+pycharm+debugging&rlz=1C1CHBF_enUS878US878&oq=pyspark+pycharm+debugging&aqs=chrome..69i57j0l2.4924j0j7&sourceid=chrome&ie=UTF-8[pyspark pycharm debugging] google search
+* https://www.google.com/search?q=pyspark+pycharm+debugging[pyspark pycharm debugging] google search
+* https://www.google.com/search?q=local+debug+scala+spark[local debug scala spark] google search
 * https://www.edureka.co/community/53204/how-to-call-the-debug-mode-in-pyspark#:~:text=PyCharm%20provides%20Python%20Debug%20Server,and%20choose%20Python%20Remote%20Debug[Q&A: how to call debug mode in PySpark]
 * another pyspark tuning tool: https://github.com/msukmanowsky/drpyspark[drpyspark]
